@@ -12,18 +12,16 @@ namespace Read_Bulks_TPS_RestAPI.Manager
         {
             _purchaseRepository = purchaseRepository;
         }
-        public Task<List<Purchase>> GetSpecificBulkPurchase(RequestBulkPurchase requestPurchase)
+        public async Task<List<Purchase>> GetSpecificBulkPurchase(RequestBulkPurchase requestPurchase)
         {
-            var result = _purchaseRepository.PurchaseStubList().Result
+            var purchases = await _purchaseRepository.PurchaseStubList();
+            var result = purchases
                 .OrderBy(o => o.ItemNo)
                 .Where(w => w.PurchaseDate >= requestPurchase.StartFrom)
                 .Take(requestPurchase.BulkAmount)
                 .ToList();
-            if (result.Count == 0)
-            {
-                throw new Exception("No data found, please check your request and send it again");
-            }
-            return Task.FromResult(result);
+
+            return result;
         }
     }
 }
